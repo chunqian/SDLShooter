@@ -1,0 +1,7 @@
+# Xcode
+.DS_Store
+*.xcworkspace
+!default.xcworkspace
+xcuserdata
+
+SDL2.xcframework
