@@ -33,7 +33,6 @@
 			isa = PBXGroup;
 			children = (
 				2261EFDE2CB8BE380040B331 /* SDLShooter */,
-				2261EFF22CB8BF200040B331 /* Frameworks */,
 				2261EFDD2CB8BE380040B331 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -44,13 +43,6 @@
 				2261EFDC2CB8BE380040B331 /* SDLShooter.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		2261EFF22CB8BF200040B331 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
