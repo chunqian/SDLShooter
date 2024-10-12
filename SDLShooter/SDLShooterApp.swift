@@ -6,6 +6,7 @@
 //
 
 import SDL2
+import SDL_ttf
 
 var app = App()
 
@@ -16,10 +17,17 @@ struct SDLShooterApp {
         
         atexit(cleanup)
         
+        let helloWorld = getTextTexture(text: "Hello World!",
+                                        font: app.font!,
+                                        renderer: app.renderer!,
+                                        color: SDL_Color(r: 255, g: 255, b: 255, a: 255))
+        
         while true {
             prepareScene()
             
             doInput()
+            
+            blit(texture: helloWorld!, x: 50, y: 50, center: false)
             
             presentScene()
             

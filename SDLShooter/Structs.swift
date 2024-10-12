@@ -10,4 +10,5 @@ import SDL2
 struct App {
     var renderer: SDL_Renderer?
     var window: SDL_Window?
+    var font: TTF_Font?
 }

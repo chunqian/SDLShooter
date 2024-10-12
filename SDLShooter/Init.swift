@@ -6,6 +6,7 @@
 //
 
 import SDL2
+import SDL_ttf
 
 func initSDL() -> Void {
     let rendererFlags = 0
@@ -28,6 +29,19 @@ func initSDL() -> Void {
         exit(1)
     }
     
+    if (TTF_Init() < 0) {
+        print("Couldn't initialize SDL TTF: \(String(cString: SDL_GetError()))")
+        exit(1)
+    }
+    
+    // 调用 TTF_OpenFont
+    app.font = TTF_OpenFont(fontPath, Int32(FONT_SIZE))
+
+    if app.font == nil {
+        print("Failed to load font: \(String(cString: SDL_GetError()))")
+        exit(1)
+    }
+    
     // 将窗口置于前台
     SDL_RaiseWindow(app.window)
     
@@ -45,6 +59,10 @@ func cleanup() -> Void {
     SDL_DestroyRenderer(app.renderer)
     
     SDL_DestroyWindow(app.window)
+    
+    TTF_CloseFont(app.font)
+    
+    TTF_Quit()
     
     SDL_Quit()
 }

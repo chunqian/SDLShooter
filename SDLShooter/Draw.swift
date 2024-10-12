@@ -15,3 +15,23 @@ func prepareScene() -> Void {
 func presentScene() -> Void {
     SDL_RenderPresent(app.renderer)
 }
+
+func blit(texture: SDL_Texture, x: Int, y: Int, center: Bool) {
+    var dest = SDL_Rect()
+    
+    // 设置坐标
+    dest.x = Int32(x)
+    dest.y = Int32(y)
+    
+    // 获取纹理的宽高
+    SDL_QueryTexture(texture, nil, nil, &dest.w, &dest.h)
+    
+    // 如果居中
+    if center {
+        dest.x -= dest.w / 2
+        dest.y -= dest.h / 2
+    }
+    
+    // 执行渲染
+    SDL_RenderCopy(app.renderer, texture, nil, &dest)
+}
