@@ -2,13 +2,17 @@
 
 set -eu
 
-# rm -rdf build
-git clone --recursive git@github.com:libsdl-org/SDL.git build/SDL
+#################### 构建 SDL2 ####################
+
+# 克隆 SDL 仓库
+# git clone --recursive https://github.com/libsdl-org/SDL.git build/SDL
 
 pushd build/SDL
 
-git checkout release-2.26.5 --force
+# 检出指定的 SDL 版本
+git checkout release-2.30.8 --force
 
+# 公共的头文件列表
 COMMON_HEADER_FILES=(
 "SDL.h"
 "SDL_assert.h"
@@ -64,20 +68,24 @@ COMMON_HEADER_FILES=(
 "close_code.h"
 )
 
+# 创建 macOS 和 iOS 的头文件目录
+rm -rdf "../Headers-macos"
+rm -rdf "../Headers-ios"
 mkdir -p "../Headers-macos"
 mkdir -p "../Headers-ios"
 for hFile in ${COMMON_HEADER_FILES[@]}; do
-  cp "include/${hFile}" "../Headers-macos"
-  cp "include/${hFile}" "../Headers-ios"
+	cp "include/${hFile}" "../Headers-macos"
+	cp "include/${hFile}" "../Headers-ios"
 done
 
+# 复制平台相关的配置文件
 cp "include/SDL_config_macosx.h" "../Headers-macos"
 cp "include/SDL_config_iphoneos.h" "../Headers-ios"
 
 
 BUILD_DIR=".."
 
-# generate module map
+# 生成模块映射文件(module map)
 COMMON_LINKED_FRAMEWORKS=(
 "AudioToolbox"
 "AVFoundation"
@@ -122,11 +130,12 @@ done
 MM_OUT_MACOS+="}\n"
 MM_OUT_IOS+="}\n"
 
+# 输出 module map 到相应的目录
 printf "%b" "${MM_OUT_MACOS}" > "../Headers-macos/module.modulemap"
 printf "%b" "${MM_OUT_IOS}" > "../Headers-ios/module.modulemap"
 
+# 构建 SDL 静态库
 pushd Xcode/SDL
-
 
 BUILD_DIR="../../.."
 
@@ -145,21 +154,150 @@ HEADERS_DIR="build/Headers"
 
 rm -rdf "${BUILD_DIR}/SDL2.xcframework"
 
-# assemble xcframework
+# 创建 xcframework
 # xcodebuild -create-xcframework \
-#  	-library "${BUILD_DIR}/SDL-macosx.xcarchive/Products/usr/local/lib/libSDL2.a" \
-#  	-headers "${HEADERS_DIR}-macos" \
-#  	-library "${BUILD_DIR}/SDL-iphoneos.xcarchive/Products/usr/local/lib/libSDL2.a" \
-#  	-headers "${HEADERS_DIR}-ios" \
-#  	-library "${BUILD_DIR}/SDL-iphonesimulator.xcarchive/Products/usr/local/lib/libSDL2.a" \
-#  	-headers "${HEADERS_DIR}-ios" \
-#  	-library "${BUILD_DIR}/SDL-appletvos.xcarchive/Products/usr/local/lib/libSDL2.a" \
-#  	-headers "${HEADERS_DIR}-ios" \
-#  	-library "${BUILD_DIR}/SDL-appletvsimulator.xcarchive/Products/usr/local/lib/libSDL2.a" \
-#  	-headers "${HEADERS_DIR}-ios" \
+# 	-library "${BUILD_DIR}/SDL-macosx.xcarchive/Products/usr/local/lib/libSDL2.a" \
+# 	-headers "${HEADERS_DIR}-macos" \
+# 	-library "${BUILD_DIR}/SDL-iphoneos.xcarchive/Products/usr/local/lib/libSDL2.a" \
+# 	-headers "${HEADERS_DIR}-ios" \
+# 	-library "${BUILD_DIR}/SDL-iphonesimulator.xcarchive/Products/usr/local/lib/libSDL2.a" \
+# 	-headers "${HEADERS_DIR}-ios" \
+# 	-library "${BUILD_DIR}/SDL-appletvos.xcarchive/Products/usr/local/lib/libSDL2.a" \
+# 	-headers "${HEADERS_DIR}-ios" \
+# 	-library "${BUILD_DIR}/SDL-appletvsimulator.xcarchive/Products/usr/local/lib/libSDL2.a" \
+# 	-headers "${HEADERS_DIR}-ios" \
 # 	-output "${BUILD_DIR}/SDL2.xcframework"
 
 xcodebuild -create-xcframework \
- 	-library "${BUILD_DIR}/SDL-macosx.xcarchive/Products/usr/local/lib/libSDL2.a" \
- 	-headers "${HEADERS_DIR}-macos" \
+	-library "${BUILD_DIR}/SDL-macosx.xcarchive/Products/usr/local/lib/libSDL2.a" \
+	-headers "${HEADERS_DIR}-macos" \
 	-output "${BUILD_DIR}/SDL2.xcframework"
+
+#################### 构建 SDL_ttf ####################
+
+# 克隆并构建 SDL_ttf
+# git clone --recursive https://github.com/libsdl-org/SDL_ttf.git build/SDL_ttf
+
+pushd build/SDL_ttf
+
+git checkout release-2.22.0 --force
+
+# 使用 CMake 构建 SDL_ttf
+mkdir -p build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2TTF_VENDORED=ON
+cmake --build .
+
+# 查找并验证生成的库文件路径
+LIB_TTF_PATH=$(find . -name "libSDL2_ttf.a")
+
+# 如果库文件未生成，抛出错误
+if [ -z "$LIB_TTF_PATH" ]; then
+	echo "Error: SDL_ttf 静态库未生成"
+	exit 1
+fi
+
+# 复制 SDL_ttf 头文件
+rm -rdf "../../Headers-macos"
+rm -rdf "../../Headers-ios"
+mkdir -p "../../Headers-macos"
+mkdir -p "../../Headers-ios"
+cp ../SDL_ttf.h "../../Headers-macos"
+cp ../SDL_ttf.h "../../Headers-ios"
+
+# 返回主目录
+popd
+
+# 创建 SDL_ttf xcframework
+rm -rdf "${BUILD_DIR}/SDL_ttf.xcframework"
+
+xcodebuild -create-xcframework \
+	-library "build/SDL_ttf/build/$LIB_TTF_PATH" \
+	-headers "${HEADERS_DIR}-macos" \
+	-output "${BUILD_DIR}/SDL_ttf.xcframework"
+
+#################### 构建 SDL_image ####################
+
+# 克隆并构建 SDL_image
+# git clone --recursive https://github.com/libsdl-org/SDL_image.git build/SDL_image
+
+pushd build/SDL_image
+
+git checkout release-2.8.2 --force
+
+# 使用 CMake 构建 SDL_image
+mkdir -p build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+cmake --build .
+
+# 查找并验证生成的库文件路径
+LIB_TTF_PATH=$(find . -name "libSDL2_image.a")
+
+# 如果库文件未生成，抛出错误
+if [ -z "$LIB_TTF_PATH" ]; then
+	echo "Error: SDL_image 静态库未生成"
+	exit 1
+fi
+
+# 复制 SDL_image 头文件
+rm -rdf "../../Headers-macos"
+rm -rdf "../../Headers-ios"
+mkdir -p "../../Headers-macos"
+mkdir -p "../../Headers-ios"
+cp ../include/SDL_image.h "../../Headers-macos"
+cp ../include/SDL_image.h "../../Headers-ios"
+
+# 返回主目录
+popd
+
+# 创建 SDL_image xcframework
+rm -rdf "${BUILD_DIR}/SDL_image.xcframework"
+
+xcodebuild -create-xcframework \
+	-library "build/SDL_image/build/$LIB_TTF_PATH" \
+	-headers "${HEADERS_DIR}-macos" \
+	-output "${BUILD_DIR}/SDL_image.xcframework"
+
+# #################### 构建 SDL_mixer ####################
+
+# 克隆并构建 SDL_mixer
+# git clone --recursive https://github.com/libsdl-org/SDL_mixer.git build/SDL_mixer
+
+pushd build/SDL_mixer
+
+git checkout release-2.8.0 --force
+
+# 使用 CMake 构建 SDL_mixer
+mkdir -p build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2MIXER_VENDORED=ON
+cmake --build .
+
+# 查找并验证生成的库文件路径
+LIB_TTF_PATH=$(find . -name "libSDL2_mixer.a")
+
+# 如果库文件未生成，抛出错误
+if [ -z "$LIB_TTF_PATH" ]; then
+	echo "Error: SDL_mixer 静态库未生成"
+	exit 1
+fi
+
+# 复制 SDL_mixer 头文件
+rm -rdf "../../Headers-macos"
+rm -rdf "../../Headers-ios"
+mkdir -p "../../Headers-macos"
+mkdir -p "../../Headers-ios"
+cp ../include/SDL_mixer.h "../../Headers-macos"
+cp ../include/SDL_mixer.h "../../Headers-ios"
+
+# 返回主目录
+popd
+
+# 创建 SDL_mixer xcframework
+rm -rdf "${BUILD_DIR}/SDL_mixer.xcframework"
+
+xcodebuild -create-xcframework \
+	-library "build/SDL_mixer/build/$LIB_TTF_PATH" \
+	-headers "${HEADERS_DIR}-macos" \
+	-output "${BUILD_DIR}/SDL_mixer.xcframework"
