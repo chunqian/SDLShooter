@@ -100,6 +100,7 @@ COMMON_LINKED_FRAMEWORKS=(
 "QuartzCore"
 )
 
+# SDL2 modulemap
 MM_OUT_MACOS="module SDL2 {\n    header \"SDL.h\"\n    header \"SDL_vulkan.h\"\n    export *\n    link \"SDL2\"\n"
 MM_OUT_IOS="module SDL2 {\n    header \"SDL.h\"\n    header \"SDL_vulkan.h\"\n    export *\n    link \"SDL2\"\n"
 
@@ -127,8 +128,29 @@ for fw in ${LINKED_FRAMEWORKS_IOS[@]}; do
 	MM_OUT_IOS+="    link framework \"${fw}\"\n"
 done
 
-MM_OUT_MACOS+="}\n"
-MM_OUT_IOS+="}\n"
+MM_OUT_MACOS+="}\n\n"
+MM_OUT_IOS+="}\n\n"
+
+# SDL_ttf modulemap
+MM_OUT_MACOS+="module SDL_ttf {\n    header \"SDL_ttf.h\"\n    export *\n    link \"SDL2_ttf\"\n"
+MM_OUT_IOS+="module SDL_ttf {\n    header \"SDL_ttf.h\"\n    export *\n    link \"SDL2_ttf\"\n"
+
+MM_OUT_MACOS+="}\n\n"
+MM_OUT_IOS+="}\n\n"
+
+# SDL_image modulemap
+MM_OUT_MACOS+="module SDL_image {\n    header \"SDL_image.h\"\n    export *\n    link \"SDL2_image\"\n"
+MM_OUT_IOS+="module SDL_image {\n    header \"SDL_image.h\"\n    export *\n    link \"SDL2_image\"\n"
+
+MM_OUT_MACOS+="}\n\n"
+MM_OUT_IOS+="}\n\n"
+
+# SDL_mixer modulemap
+MM_OUT_MACOS+="module SDL_mixer {\n    header \"SDL_mixer.h\"\n    export *\n    link \"SDL2_mixer\"\n"
+MM_OUT_IOS+="module SDL_mixer {\n    header \"SDL_mixer.h\"\n    export *\n    link \"SDL2_mixer\"\n"
+
+MM_OUT_MACOS+="}\n\n"
+MM_OUT_IOS+="}\n\n"
 
 # 输出 module map 到相应的目录
 printf "%b" "${MM_OUT_MACOS}" > "../Headers-macos/module.modulemap"
