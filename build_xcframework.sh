@@ -207,7 +207,7 @@ git checkout release-2.22.0 --force
 # 使用 CMake 构建 SDL_ttf
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2TTF_VENDORED=ON
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2TTF_VENDORED=ON -DSDL2TTF_SAMPLES=OFF -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 cmake --build .
 
 # 查找并验证生成的库文件路径
@@ -238,6 +238,8 @@ xcodebuild -create-xcframework \
 	-headers "${HEADERS_DIR}-macos" \
 	-output "${BUILD_DIR}/SDL_ttf.xcframework"
 
+# 创建 SDL_ttf xcframework
+
 #################### 构建 SDL_image ####################
 
 # 克隆并构建 SDL_image
@@ -250,7 +252,7 @@ git checkout release-2.8.2 --force
 # 使用 CMake 构建 SDL_image
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2IMAGE_SAMPLES=OFF -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 cmake --build .
 
 # 查找并验证生成的库文件路径
@@ -293,7 +295,7 @@ git checkout release-2.8.0 --force
 # 使用 CMake 构建 SDL_mixer
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2MIXER_VENDORED=ON
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2MIXER_VENDORED=ON -DSDL2MIXER_SAMPLES=OFF -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 cmake --build .
 
 # 查找并验证生成的库文件路径
