@@ -8,6 +8,6 @@
 import SDL_ttf
 import Foundation
 
-let FONT_SIZE = 48
+let FONT_SIZE = 16
 
-let fontPath = Bundle.main.path(forResource: "Font", ofType: "ttf")
+let fontPath = Bundle.main.path(forResource: "Unifont", ofType: "ttf")
