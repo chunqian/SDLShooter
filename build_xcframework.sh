@@ -8,6 +8,7 @@ set -eu
 # git clone --recursive https://github.com/libsdl-org/SDL.git build/SDL
 
 pushd build/SDL
+echo $PWD
 
 # 检出指定的 SDL 版本
 git checkout release-2.30.8 --force
@@ -151,12 +152,20 @@ MM_OUT_IOS+="module SDL_mixer {\n    header \"SDL_mixer.h\"\n    export *\n    l
 MM_OUT_MACOS+="}\n\n"
 MM_OUT_IOS+="}\n\n"
 
+# freetype modulemap
+MM_OUT_MACOS+="module freetype {\n    link \"freetype\"\n"
+MM_OUT_IOS+="module freetype {\n    link \"freetype\"\n"
+
+MM_OUT_MACOS+="}\n\n"
+MM_OUT_IOS+="}\n\n"
+
 # 输出 module map 到相应的目录
 printf "%b" "${MM_OUT_MACOS}" > "../Headers-macos/module.modulemap"
 printf "%b" "${MM_OUT_IOS}" > "../Headers-ios/module.modulemap"
 
 # 构建 SDL 静态库
 pushd Xcode/SDL
+echo $PWD
 
 BUILD_DIR="../../.."
 
@@ -168,7 +177,9 @@ xcodebuild archive -quiet ONLY_ACTIVE_ARCH=NO -scheme "Static Library" -project 
 # xcodebuild archive -quiet ONLY_ACTIVE_ARCH=NO -scheme "Static Library-tvOS" -project "SDL.xcodeproj" -archivePath "${BUILD_DIR}/SDL-appletvsimulator/" -destination "generic/platform=tvOS Simulator" BUILD_LIBRARY_FOR_DISTRIBUTION=YES SKIP_INSTALL=NO
 
 popd
+echo $PWD
 popd
+echo $PWD
 
 BUILD_DIR="build"
 HEADERS_DIR="build/Headers"
@@ -200,13 +211,14 @@ xcodebuild -create-xcframework \
 # git clone --recursive https://github.com/libsdl-org/SDL_ttf.git build/SDL_ttf
 
 pushd build/SDL_ttf
+echo $PWD
 
 git checkout release-2.22.0 --force
 
 # 使用 CMake 构建 SDL_ttf
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2TTF_VENDORED=ON -DSDL2TTF_SAMPLES=OFF -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2TTF_VENDORED=ON -DSDL2TTF_SAMPLES=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 cmake --build .
 
 # 查找并验证生成的库文件路径
@@ -228,6 +240,7 @@ cp ../SDL_ttf.h "../../Headers-ios"
 
 # 返回主目录
 popd
+echo $PWD
 
 # 创建 SDL_ttf xcframework
 rm -rdf "${BUILD_DIR}/SDL_ttf.xcframework"
@@ -245,13 +258,14 @@ xcodebuild -create-xcframework \
 # git clone --recursive https://github.com/libsdl-org/SDL_image.git build/SDL_image
 
 pushd build/SDL_image
+echo $PWD
 
 git checkout release-2.8.2 --force
 
 # 使用 CMake 构建 SDL_image
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2IMAGE_SAMPLES=OFF -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2IMAGE_SAMPLES=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 cmake --build .
 
 # 查找并验证生成的库文件路径
@@ -273,6 +287,7 @@ cp ../include/SDL_image.h "../../Headers-ios"
 
 # 返回主目录
 popd
+echo $PWD
 
 # 创建 SDL_image xcframework
 rm -rdf "${BUILD_DIR}/SDL_image.xcframework"
@@ -288,13 +303,14 @@ xcodebuild -create-xcframework \
 # git clone --recursive https://github.com/libsdl-org/SDL_mixer.git build/SDL_mixer
 
 pushd build/SDL_mixer
+echo $PWD
 
 git checkout release-2.8.0 --force
 
 # 使用 CMake 构建 SDL_mixer
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2MIXER_VENDORED=ON -DSDL2MIXER_SAMPLES=OFF -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2MIXER_VENDORED=ON -DSDL2MIXER_SAMPLES=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 cmake --build .
 
 # 查找并验证生成的库文件路径
@@ -316,6 +332,7 @@ cp ../include/SDL_mixer.h "../../Headers-ios"
 
 # 返回主目录
 popd
+echo $PWD
 
 # 创建 SDL_mixer xcframework
 rm -rdf "${BUILD_DIR}/SDL_mixer.xcframework"
@@ -324,3 +341,30 @@ xcodebuild -create-xcframework \
 	-library "build/SDL_mixer/build/$LIB_TTF_PATH" \
 	-headers "${HEADERS_DIR}-macos" \
 	-output "${BUILD_DIR}/SDL_mixer.xcframework"
+
+#################### 构建 freetype ####################
+
+FREETYPE_BUILD_DIR=build/SDL_ttf/build/external/freetype
+
+pushd ${FREETYPE_BUILD_DIR}
+echo $PWD
+
+# 查找并验证生成的库文件路径
+LIB_TTF_PATH=$(find . -name "libfreetype.a")
+
+# 如果库文件未生成, 抛出错误
+if [ -z "$LIB_TTF_PATH" ]; then
+	echo "Error: freetype 静态库未生成"
+	exit 1
+fi
+
+# 返回主目录
+popd
+echo $PWD
+
+# 创建 freetype xcframework
+rm -rdf "${BUILD_DIR}/freetype.xcframework"
+
+xcodebuild -create-xcframework \
+	-library "${FREETYPE_BUILD_DIR}/$LIB_TTF_PATH" \
+	-output "${BUILD_DIR}/freetype.xcframework"

@@ -9,3 +9,4 @@ SDL2.xcframework
 SDL_ttf.xcframework
 SDL_image.xcframework
 SDL_mixer.xcframework
+freetype.xcframework
