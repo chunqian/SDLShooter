@@ -10,7 +10,8 @@ import SDL_ttf
 
 func initSDL() -> Void {
     let rendererFlags = 0
-    let windowFlags = SDL_RENDERER_ACCELERATED
+    // let windowFlags: SDL_WindowFlags = SDL_WindowFlags(rawValue: SDL_RENDERER_ACCELERATED.rawValue | SDL_WINDOW_ALLOW_HIGHDPI.rawValue)
+    let windowFlags: SDL_WindowFlags = SDL_WindowFlags(rawValue: SDL_RENDERER_ACCELERATED.rawValue)
     
     if SDL_Init(SDL_INIT_VIDEO) < 0 {
         print("Couldn't initialize SDL: \(String(cString: SDL_GetError()))")
