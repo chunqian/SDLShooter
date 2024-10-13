@@ -12,3 +12,9 @@ struct App {
     var window: SDL_Window?
     var font: TTF_Font?
 }
+
+struct Entity {
+    var x: Int?
+    var y: Int?
+    var texture: SDL_Texture?
+}

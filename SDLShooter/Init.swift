@@ -10,8 +10,7 @@ import SDL_ttf
 
 func initSDL() -> Void {
     let rendererFlags = 0
-    // let windowFlags: SDL_WindowFlags = SDL_WindowFlags(rawValue: SDL_RENDERER_ACCELERATED.rawValue | SDL_WINDOW_ALLOW_HIGHDPI.rawValue)
-    let windowFlags: SDL_WindowFlags = SDL_WindowFlags(rawValue: SDL_RENDERER_ACCELERATED.rawValue)
+    let windowFlags: SDL_WindowFlags = SDL_WindowFlags(rawValue: SDL_RENDERER_ACCELERATED.rawValue | SDL_WINDOW_ALLOW_HIGHDPI.rawValue)
     
     if SDL_Init(SDL_INIT_VIDEO) < 0 {
         print("Couldn't initialize SDL: \(String(cString: SDL_GetError()))")
@@ -46,7 +45,7 @@ func initSDL() -> Void {
     // 将窗口置于前台
     SDL_RaiseWindow(app.window)
     
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear")
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest") // 像素化效果
     
     app.renderer = SDL_CreateRenderer(app.window, -1, Uint32(rendererFlags))
     
