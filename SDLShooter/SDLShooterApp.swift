@@ -17,7 +17,7 @@ struct SDLShooterApp {
         
         atexit(cleanup)
         
-        let helloWorld = getTextTexture(text: "Hello World! 你好 世界！",
+        let helloWorld = getTextTexture(text: "Hello, World! 你好，世界！",
                                         font: app.font!,
                                         renderer: app.renderer!,
                                         color: SDL_Color(r: 255, g: 255, b: 255, a: 255))
