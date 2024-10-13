@@ -82,7 +82,6 @@ done
 cp "include/SDL_config_macosx.h" "../Headers-macos"
 cp "include/SDL_config_iphoneos.h" "../Headers-ios"
 
-
 BUILD_DIR=".."
 
 # 生成模块映射文件(module map)
@@ -213,7 +212,7 @@ cmake --build .
 # 查找并验证生成的库文件路径
 LIB_TTF_PATH=$(find . -name "libSDL2_ttf.a")
 
-# 如果库文件未生成，抛出错误
+# 如果库文件未生成, 抛出错误
 if [ -z "$LIB_TTF_PATH" ]; then
 	echo "Error: SDL_ttf 静态库未生成"
 	exit 1
@@ -258,7 +257,7 @@ cmake --build .
 # 查找并验证生成的库文件路径
 LIB_TTF_PATH=$(find . -name "libSDL2_image.a")
 
-# 如果库文件未生成，抛出错误
+# 如果库文件未生成, 抛出错误
 if [ -z "$LIB_TTF_PATH" ]; then
 	echo "Error: SDL_image 静态库未生成"
 	exit 1
@@ -301,7 +300,7 @@ cmake --build .
 # 查找并验证生成的库文件路径
 LIB_TTF_PATH=$(find . -name "libSDL2_mixer.a")
 
-# 如果库文件未生成，抛出错误
+# 如果库文件未生成, 抛出错误
 if [ -z "$LIB_TTF_PATH" ]; then
 	echo "Error: SDL_mixer 静态库未生成"
 	exit 1
