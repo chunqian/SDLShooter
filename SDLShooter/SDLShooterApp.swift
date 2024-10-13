@@ -16,6 +16,8 @@ struct SDLShooterApp {
     static func main() {
         initSDL()
         
+        initMusic()
+        
         player.x = 100
         player.y = 100
         player.texture = loadTexture(filename: playerPath!)

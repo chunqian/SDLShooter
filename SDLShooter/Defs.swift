@@ -9,6 +9,9 @@ typealias SDL_Renderer = OpaquePointer
 typealias SDL_Window = OpaquePointer
 typealias SDL_Texture = OpaquePointer
 typealias TTF_Font = OpaquePointer
+typealias Mix_Music = OpaquePointer
 
 let SCREEN_WIDTH = 960
 let SCREEN_HEIGHT = 540
+
+let MAX_SND_CHANNELS = 8

@@ -7,6 +7,7 @@
 
 import SDL2
 import SDL_ttf
+import SDL_mixer
 
 func initSDL() -> Void {
     let rendererFlags = 0
@@ -16,6 +17,13 @@ func initSDL() -> Void {
         print("Couldn't initialize SDL: \(String(cString: SDL_GetError()))")
         exit(1)
     }
+    
+    if Mix_OpenAudio(44100, Uint16(MIX_DEFAULT_FORMAT), 2, 1024) == -1 {
+        print("Couldn't initialize SDL Mixer")
+        exit(1)
+    }
+
+    Mix_AllocateChannels(Int32(MAX_SND_CHANNELS))
     
     app.window = SDL_CreateWindow("Shooter 01",
                                   Int32(SDL_WINDOWPOS_UNDEFINED_MASK),
@@ -55,7 +63,15 @@ func initSDL() -> Void {
     }
 }
 
+func initMusic() -> Void {
+    loadMusic(filename: musicPath!)
+    
+    playMusic(loop: true)
+}
+
 func cleanup() -> Void {
+    Mix_Quit()
+    
     SDL_DestroyRenderer(app.renderer)
     
     SDL_DestroyWindow(app.window)
