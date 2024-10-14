@@ -10,3 +10,4 @@ import Foundation
 let fontPath = Bundle.main.path(forResource: "Unifont", ofType: "ttf")
 let playerPath = Bundle.main.path(forResource: "Player", ofType: "png")
 let musicPath = Bundle.main.path(forResource: "Mercury", ofType: "ogg")
+let palPath = Bundle.main.path(forResource: "Pal", ofType: "mid")

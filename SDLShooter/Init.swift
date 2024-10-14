@@ -64,7 +64,7 @@ func initSDL() -> Void {
 }
 
 func initMusic() -> Void {
-    loadMusic(filename: musicPath!)
+    loadMusic(filename: palPath!)
     
     playMusic(loop: true)
 }
