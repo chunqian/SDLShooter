@@ -207,6 +207,7 @@ xcodebuild -create-xcframework \
 	-headers "${HEADERS_DIR}-macos" \
 	-output "${BUILD_DIR}/XCFramework/SDL2.xcframework"
 
+
 #################### 构建 SDL_ttf ####################
 
 # 克隆并构建 SDL_ttf
@@ -224,10 +225,10 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2TTF_VENDORED=O
 cmake --build .
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libSDL2_ttf.a")
+STATIC_LIB_PATH=$(find . -name "libSDL2_ttf.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: SDL_ttf 静态库未生成"
 	exit 1
 fi
@@ -237,8 +238,8 @@ rm -rdf "../../Headers-macos"
 rm -rdf "../../Headers-ios"
 mkdir -p "../../Headers-macos"
 mkdir -p "../../Headers-ios"
-cp ../SDL_ttf.h "../../Headers-macos"
-cp ../SDL_ttf.h "../../Headers-ios"
+cp "../SDL_ttf.h" "../../Headers-macos"
+cp "../SDL_ttf.h" "../../Headers-ios"
 
 # 返回主目录
 popd
@@ -248,11 +249,10 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/SDL_ttf.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "build/SDL_ttf/build/$LIB_TTF_PATH" \
+	-library "build/SDL_ttf/build/$STATIC_LIB_PATH" \
 	-headers "${HEADERS_DIR}-macos" \
 	-output "${BUILD_DIR}/XCFramework/SDL_ttf.xcframework"
 
-# 创建 SDL_ttf xcframework
 
 #################### 构建 SDL_image ####################
 
@@ -271,10 +271,10 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2IMAGE_SAMPLES=
 cmake --build .
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libSDL2_image.a")
+STATIC_LIB_PATH=$(find . -name "libSDL2_image.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: SDL_image 静态库未生成"
 	exit 1
 fi
@@ -284,8 +284,8 @@ rm -rdf "../../Headers-macos"
 rm -rdf "../../Headers-ios"
 mkdir -p "../../Headers-macos"
 mkdir -p "../../Headers-ios"
-cp ../include/SDL_image.h "../../Headers-macos"
-cp ../include/SDL_image.h "../../Headers-ios"
+cp "../include/SDL_image.h" "../../Headers-macos"
+cp "../include/SDL_image.h" "../../Headers-ios"
 
 # 返回主目录
 popd
@@ -295,9 +295,10 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/SDL_image.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "build/SDL_image/build/$LIB_TTF_PATH" \
+	-library "build/SDL_image/build/$STATIC_LIB_PATH" \
 	-headers "${HEADERS_DIR}-macos" \
 	-output "${BUILD_DIR}/XCFramework/SDL_image.xcframework"
+
 
 # #################### 构建 SDL_mixer ####################
 
@@ -316,10 +317,10 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2MIXER_VENDORED
 cmake --build .
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libSDL2_mixer.a")
+STATIC_LIB_PATH=$(find . -name "libSDL2_mixer.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: SDL_mixer 静态库未生成"
 	exit 1
 fi
@@ -329,8 +330,8 @@ rm -rdf "../../Headers-macos"
 rm -rdf "../../Headers-ios"
 mkdir -p "../../Headers-macos"
 mkdir -p "../../Headers-ios"
-cp ../include/SDL_mixer.h "../../Headers-macos"
-cp ../include/SDL_mixer.h "../../Headers-ios"
+cp "../include/SDL_mixer.h" "../../Headers-macos"
+cp "../include/SDL_mixer.h" "../../Headers-ios"
 
 # 返回主目录
 popd
@@ -340,9 +341,65 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/SDL_mixer.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "build/SDL_mixer/build/$LIB_TTF_PATH" \
+	-library "build/SDL_mixer/build/$STATIC_LIB_PATH" \
 	-headers "${HEADERS_DIR}-macos" \
 	-output "${BUILD_DIR}/XCFramework/SDL_mixer.xcframework"
+
+
+#################### 构建 SDL_gfx ####################
+
+# 克隆并构建 SDL_gfx
+# git clone --recursive https://github.com/libsdl-org/SDL_gfx.git build/SDL_gfx
+
+pushd build/SDL_gfx
+echo $PWD
+
+git checkout release-1.0.4 --force
+
+# 使用 CMake 构建 SDL_gfx
+mkdir -p build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSDL2GFX_VENDORED=ON -DSDL2GFX_SAMPLES=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+cmake --build .
+
+# 查找并验证生成的库文件路径
+STATIC_LIB_PATH=$(find . -name "libSDL2_gfx.a")
+
+# 如果库文件未生成, 抛出错误
+if [ -z "$STATIC_LIB_PATH" ]; then
+	echo "Error: SDL_gfx 静态库未生成"
+	exit 1
+fi
+
+COMMON_HEADER_FILES=(
+"SDL2_gfxPrimitives.h"
+"SDL2_imageFilter.h"
+"SDL2_rotozoom.h"
+"SDL2_gfxPrimitives_font.h"
+)
+
+# 复制 SDL_gfx 头文件
+rm -rdf "../../Headers-macos"
+rm -rdf "../../Headers-ios"
+mkdir -p "../../Headers-macos"
+mkdir -p "../../Headers-ios"
+for hFile in ${COMMON_HEADER_FILES[@]}; do
+	cp "../${hFile}" "../../Headers-macos"
+	cp "../${hFile}" "../../Headers-ios"
+done
+
+# 返回主目录
+popd
+echo $PWD
+
+# 创建 SDL_gfx xcframework
+rm -rdf "${BUILD_DIR}/XCFramework/SDL_gfx.xcframework"
+
+xcodebuild -create-xcframework \
+	-library "build/SDL_gfx/build/$STATIC_LIB_PATH" \
+	-headers "${HEADERS_DIR}-macos" \
+	-output "${BUILD_DIR}/XCFramework/SDL_gfx.xcframework"
+
 
 #################### 构建 freetype ####################
 
@@ -352,10 +409,10 @@ pushd ${FREETYPE_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libfreetype.a")
+STATIC_LIB_PATH=$(find . -name "libfreetype.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: freetype 静态库未生成"
 	exit 1
 fi
@@ -368,8 +425,9 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/freetype.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${FREETYPE_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${FREETYPE_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/freetype.xcframework"
+
 
 #################### 构建 ogg ####################
 
@@ -379,10 +437,10 @@ pushd ${OGG_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libogg.a")
+STATIC_LIB_PATH=$(find . -name "libogg.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: ogg 静态库未生成"
 	exit 1
 fi
@@ -395,8 +453,9 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/ogg.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${OGG_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${OGG_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/ogg.xcframework"
+
 
 #################### 构建 wavpack ####################
 
@@ -406,10 +465,10 @@ pushd ${WAVPACK_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libwavpack.a")
+STATIC_LIB_PATH=$(find . -name "libwavpack.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: wavpack 静态库未生成"
 	exit 1
 fi
@@ -422,8 +481,9 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/wavpack.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${WAVPACK_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${WAVPACK_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/wavpack.xcframework"
+
 
 #################### 构建 libxmp ####################
 
@@ -433,10 +493,10 @@ pushd ${LIBXMP_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libxmp.a")
+STATIC_LIB_PATH=$(find . -name "libxmp.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: libxmp 静态库未生成"
 	exit 1
 fi
@@ -449,8 +509,9 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/libxmp.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${LIBXMP_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${LIBXMP_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/libxmp.xcframework"
+
 
 #################### 构建 opus ####################
 
@@ -460,10 +521,10 @@ pushd ${OPUS_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libopus.a")
+STATIC_LIB_PATH=$(find . -name "libopus.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: opus 静态库未生成"
 	exit 1
 fi
@@ -476,8 +537,9 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/opus.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${OPUS_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${OPUS_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/opus.xcframework"
+
 
 #################### 构建 opusfile ####################
 
@@ -487,10 +549,10 @@ pushd ${OPUSFILE_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libopusfile.a")
+STATIC_LIB_PATH=$(find . -name "libopusfile.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: opusfile 静态库未生成"
 	exit 1
 fi
@@ -503,8 +565,9 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/opusfile.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${OPUSFILE_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${OPUSFILE_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/opusfile.xcframework"
+
 
 #################### 构建 vorbis ####################
 
@@ -514,10 +577,10 @@ pushd ${VORBIS_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libvorbis.a")
+STATIC_LIB_PATH=$(find . -name "libvorbis.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: vorbis 静态库未生成"
 	exit 1
 fi
@@ -530,8 +593,9 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/vorbis.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${VORBIS_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${VORBIS_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/vorbis.xcframework"
+
 
 #################### 构建 vorbisfile ####################
 
@@ -541,10 +605,10 @@ pushd ${VORBISFILE_BUILD_DIR}
 echo $PWD
 
 # 查找并验证生成的库文件路径
-LIB_TTF_PATH=$(find . -name "libvorbisfile.a")
+STATIC_LIB_PATH=$(find . -name "libvorbisfile.a")
 
 # 如果库文件未生成, 抛出错误
-if [ -z "$LIB_TTF_PATH" ]; then
+if [ -z "$STATIC_LIB_PATH" ]; then
 	echo "Error: vorbisfile 静态库未生成"
 	exit 1
 fi
@@ -557,5 +621,5 @@ echo $PWD
 rm -rdf "${BUILD_DIR}/XCFramework/vorbisfile.xcframework"
 
 xcodebuild -create-xcframework \
-	-library "${VORBISFILE_BUILD_DIR}/$LIB_TTF_PATH" \
+	-library "${VORBISFILE_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/vorbisfile.xcframework"
