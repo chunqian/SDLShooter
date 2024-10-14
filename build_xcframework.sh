@@ -152,9 +152,9 @@ MM_OUT_IOS+="module SDL_mixer {\n    header \"SDL_mixer.h\"\n    export *\n    l
 MM_OUT_MACOS+="}\n\n"
 MM_OUT_IOS+="}\n\n"
 
-# freetype modulemap
-MM_OUT_MACOS+="module freetype {\n    link \"freetype\"\n"
-MM_OUT_IOS+="module freetype {\n    link \"freetype\"\n"
+# SDL_gfx modulemap
+MM_OUT_MACOS+="module SDL_gfx {\n    header \"SDL2_gfxPrimitives.h\"\n    header \"SDL2_imageFilter.h\"\n    header \"SDL2_rotozoom.h\"\n    export *\n    link \"SDL2_gfx\"\n"
+MM_OUT_IOS+="module SDL_gfx {\n    header \"SDL2_gfxPrimitives.h\"\n    header \"SDL2_imageFilter.h\"\n    header \"SDL2_rotozoom.h\"\n    export *\n    link \"SDL2_gfx\"\n"
 
 MM_OUT_MACOS+="}\n\n"
 MM_OUT_IOS+="}\n\n"

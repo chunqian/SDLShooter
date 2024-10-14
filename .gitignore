@@ -5,15 +5,4 @@
 xcuserdata
 
 build/
-SDL2.xcframework
-SDL_ttf.xcframework
-SDL_image.xcframework
-SDL_mixer.xcframework
-freetype.xcframework
-libxmp.xcframework
-ogg.xcframework
-opus.xcframework
-opusfile.xcframework
-vorbis.xcframework
-vorbisfile.xcframework
-wavpack.xcframework
+*.xcframework
