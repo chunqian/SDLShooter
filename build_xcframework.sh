@@ -159,6 +159,13 @@ MM_OUT_IOS+="module SDL_gfx {\n    header \"SDL2_gfxPrimitives.h\"\n    header \
 MM_OUT_MACOS+="}\n\n"
 MM_OUT_IOS+="}\n\n"
 
+# box2d modulemap
+MM_OUT_MACOS+="module Box2d {\n    header \"box2d.h\"\n    export *\n    link \"box2d\"\n"
+MM_OUT_IOS+="module Box2d {\n    header \"box2d.h\"\n    export *\n    link \"box2d\"\n"
+
+MM_OUT_MACOS+="}\n\n"
+MM_OUT_IOS+="}\n\n"
+
 # 输出 module map 到相应的目录
 printf "%b" "${MM_OUT_MACOS}" > "../Headers-macos/module.modulemap"
 printf "%b" "${MM_OUT_IOS}" > "../Headers-ios/module.modulemap"
@@ -623,3 +630,59 @@ rm -rdf "${BUILD_DIR}/XCFramework/vorbisfile.xcframework"
 xcodebuild -create-xcframework \
 	-library "${VORBISFILE_BUILD_DIR}/$STATIC_LIB_PATH" \
 	-output "${BUILD_DIR}/XCFramework/vorbisfile.xcframework"
+
+#################### 构建 box2d ####################
+
+# 克隆并构建 box2d
+# git clone --recursive https://github.com/erincatto/box2d.git build/box2d
+
+pushd build/box2d
+echo $PWD
+
+git checkout v3.0.0 --force
+
+# 使用 CMake 构建 box2d
+mkdir -p build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DBOX2D_UNIT_TESTS=OFF -DBOX2D_SAMPLES=OFF -DBOX2D_VALIDATE=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+cmake --build .
+
+# 查找并验证生成的库文件路径
+STATIC_LIB_PATH=$(find . -name "libbox2d.a")
+
+# 如果库文件未生成, 抛出错误
+if [ -z "$STATIC_LIB_PATH" ]; then
+	echo "Error: box2d 静态库未生成"
+	exit 1
+fi
+
+COMMON_HEADER_FILES=(
+"box2d.h"
+"base.h"
+"collision.h"
+"id.h"
+"math_functions.h"
+"types.h"
+)
+
+# 复制 box2d 头文件
+rm -rdf "../../Headers-macos"
+rm -rdf "../../Headers-ios"
+mkdir -p "../../Headers-macos"
+mkdir -p "../../Headers-ios"
+for hFile in ${COMMON_HEADER_FILES[@]}; do
+	cp "../include/box2d/${hFile}" "../../Headers-macos"
+	cp "../include/box2d/${hFile}" "../../Headers-ios"
+done
+
+# 返回主目录
+popd
+echo $PWD
+
+# 创建 box2d xcframework
+rm -rdf "${BUILD_DIR}/XCFramework/box2d.xcframework"
+
+xcodebuild -create-xcframework \
+	-library "build/box2d/build/$STATIC_LIB_PATH" \
+	-headers "${HEADERS_DIR}-macos" \
+	-output "${BUILD_DIR}/XCFramework/box2d.xcframework"
